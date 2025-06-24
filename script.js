@@ -1,3 +1,10 @@
+// ----- Global State -----
+let players = [];
+let currentPlayerIndex = 0; // For turn-based logic
+let cardHistory = [];       // Each entry: { playerIndex, card, type, coinChange }
+let drawnCards = [];
+
+// ----- Card Data -----
 const mysteryCards = [
     { text: "+1 Coin", img: "resources/images/coin.png" },
     { text: "-1 Coin", img: "resources/images/coin.png" },
@@ -36,7 +43,7 @@ const questionCards = [
     "Which do you prefer, Playstation or Nintendo?",
     "Lucky 7: Write a 7 letter word on the board",
     "Lucky ABC: Sing the ABC song",
-    "Super Lucky: 先⽣に答えてもらったり、代わりにチャレンジをやってもらったりするのに使えます (One time use)",
+    "Super Lucky: 先生に答えてもらったり、代わりにチャレンジをやってもらったりするのに使えます (One time use)",
     "How are you? Draw a picture of how you feel on the board.",
     "Hey Katie! Ask Katie a question.",
     "Hey Katie! Ask Katie a question.",
@@ -44,57 +51,191 @@ const questionCards = [
     "HELL-O: Say 3 words that start with the letter O"
 ];
 
-let drawnCards = [];
-let coins = 0;
+// ----- Characters -----
+const characterPool = [
+    { name: "Mario", img: "resources/images/mario.webp", icon: "resources/images/mario-icon.png" },
+    { name: "Peach", img: "resources/images/peach.webp", icon: "resources/images/peach-icon.png" },
+    { name: "Yoshi", img: "resources/images/yoshi.webp", icon: "resources/images/yoshi-icon.png" },
+    { name: "Luigi", img: "resources/images/luigi.webp", icon: "resources/images/luigi-icon.png" },
+    { name: "Toad", img: "resources/images/toad.webp", icon: "resources/images/toad-icon.png" },
+    { name: "Donkey Kong", img: "resources/images/donkeykong.webp", icon: "resources/images/donkeykong-icon.png" },
+    { name: "Bowser", img: "resources/images/bowser.webp", icon: "resources/images/bowser-icon.png" }
+];
 
-function drawCard(type) {
-    const list = type === 'mystery' ? mysteryCards : questionCards;
-    const card = list[Math.floor(Math.random() * list.length)];
-    drawnCards.push(card);
-    updateDrawnCards();
-    showCardPopup(card); // ✅ show popup here
+// ----- UI Update Functions -----
+
+function updatePlayerSummary() {
+    const container = document.getElementById('playerSummary');
+    container.innerHTML = '';
+
+    players.forEach((player, index) => {
+        const box = document.createElement('div');
+        box.className = 'player-box';
+
+        if (index === currentPlayerIndex) {
+            box.style.border = '3px solid gold';
+            box.style.boxShadow = '0 0 10px gold';
+        }
+
+        // Removed the cards list from here
+        box.innerHTML = `
+            <h3>${player.name}</h3>
+            <img src="${player.character.icon}" alt="${player.character.name}">
+            <p>${player.character.name}</p>
+            <p>Coins: ${player.coins}</p>
+        `;
+
+        container.appendChild(box);
+    });
 }
-
 
 function updateDrawnCards() {
     const ul = document.getElementById('drawnCards');
     ul.innerHTML = '';
 
-    drawnCards.forEach(card => {
+    cardHistory.forEach(entry => {
         const li = document.createElement('li');
+        const player = players[entry.playerIndex];
 
-        if (typeof card === 'object') {
+        // --- Start of change ---
+        // Create a fragment to hold the card content first
+        const cardContentFragment = document.createDocumentFragment();
+
+        if (typeof entry.card === 'object') {
             // Mystery card with image
             const img = document.createElement('img');
-            img.src = card.img;
-            img.alt = card.text;
-            img.style.width = '30px'; // adjust size as needed
+            img.src = entry.card.img;
+            img.alt = entry.card.text;
+            img.style.width = '30px';
             img.style.marginRight = '10px';
-            li.appendChild(img);
+            cardContentFragment.appendChild(img);
 
             const span = document.createElement('span');
-            span.textContent = card.text;
-            li.appendChild(span);
+            span.textContent = entry.card.text;
+            cardContentFragment.appendChild(span);
         } else {
             // Question card (plain text)
-            li.textContent = card;
+            const span = document.createElement('span');
+            span.textContent = entry.card;
+            cardContentFragment.appendChild(span);
         }
+
+        // Append the card content to the list item
+        li.appendChild(cardContentFragment);
+
+        // Add player's icon at the end
+        if (player && player.character && player.character.icon) {
+            const playerIcon = document.createElement('img');
+            playerIcon.src = player.character.icon;
+            playerIcon.alt = player.name;
+            playerIcon.style.width = '24px';
+            playerIcon.style.height = '24px';
+            playerIcon.style.verticalAlign = 'middle';
+            playerIcon.style.marginLeft = '8px'; // Use marginLeft to push it right
+            li.appendChild(playerIcon);
+        }
+        // --- End of change ---
 
         ul.appendChild(li);
     });
 }
 
+// ----- Game Logic -----
+
+function drawCard(type) {
+    const list = type === 'mystery' ? mysteryCards : questionCards;
+    const card = list[Math.floor(Math.random() * list.length)];
+    // drawnCards.push(card); // No longer push to drawnCards here
+    showCardPopup(card);
+    // updateDrawnCards(); // This call will now happen after cardHistory.push
+
+    let coinChange = 0;
+
+    if (type === 'mystery') {
+        // players[currentPlayerIndex].cards.push(card); // Removed card storage in player object
+        updatePlayerSummary();
+
+        // Detect coin changes
+        const text = typeof card === "object" ? card.text : card;
+        if (text.includes("+1 Coin")) coinChange = 1;
+        if (text.includes("-1 Coin")) coinChange = -1;
+        if (text.includes("+3 Coins")) coinChange = 3;
+        if (text.includes("-3 Coins")) coinChange = -3;
+        if (text.includes("Lose all your coins")) coinChange = -players[currentPlayerIndex].coins;
+
+        changeCoins(coinChange);
+    }
+
+    // Save to undo history - this is where we track the drawn card
+    cardHistory.push({ playerIndex: currentPlayerIndex, card, type, coinChange });
+    updateDrawnCards(); // Call updateDrawnCards AFTER pushing to history
+}
 
 function changeCoins(amount) {
-    coins += amount;
-    document.getElementById('coinCount').textContent = coins;
+    players[currentPlayerIndex].coins += amount;
+    updatePlayerSummary();
 }
 
 function resetGame() {
-    drawnCards = [];
-    coins = 0;
+    drawnCards = []; // This array is now largely unused for display
+    cardHistory = [];
+    players.forEach(player => {
+        // player.cards = []; // No longer needed as cards aren't stored here
+        player.coins = 0;
+    });
     updateDrawnCards();
-    document.getElementById('coinCount').textContent = coins;
+    updatePlayerSummary();
+}
+
+function undoLastAction() {
+    if (cardHistory.length === 0) return;
+
+    const last = cardHistory.pop();
+    // drawnCards.pop(); // No longer relevant for display
+
+    if (last.type === 'mystery') {
+        // players[last.playerIndex].cards.pop(); // No longer needed
+        players[last.playerIndex].coins -= last.coinChange; // Reverse coin change directly
+    }
+
+    updateDrawnCards();
+    updatePlayerSummary();
+}
+
+function nextPlayer() {
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    highlightCurrentPlayer();
+}
+
+function highlightCurrentPlayer() {
+    const display = document.getElementById('currentPlayerDisplay');
+    if (display && players.length > 0) {
+        display.textContent = `Current Player: ${players[currentPlayerIndex].name}`;
+    }
+    updatePlayerSummary();
+}
+
+// ----- Popup and Animation -----
+
+function showCardPopup(card) {
+    const popup = document.getElementById("cardPopup");
+    const popupImg = document.getElementById("popupImg");
+    const popupText = document.getElementById("popupText");
+
+    if (typeof card === "object") {
+        popupImg.src = card.img;
+        popupImg.style.display = "block";
+        popupText.textContent = card.text;
+    } else {
+        popupImg.style.display = "none";
+        popupText.textContent = card;
+    }
+
+    popup.classList.add("show");
+
+    setTimeout(() => {
+        popup.classList.remove("show");
+    }, 2500);
 }
 
 function showFlyAnimation(symbol) {
@@ -119,26 +260,56 @@ function showBigMessage(text) {
     }, 2000);
 }
 
-function showCardPopup(card) {
-    const popup = document.getElementById("cardPopup");
-    const popupImg = document.getElementById("popupImg");
-    const popupText = document.getElementById("popupText");
+// ----- Character Assignment -----
 
-    // Check if it's a mystery card with image or just text
-    if (typeof card === "object") {
-        popupImg.src = card.img;
-        popupImg.style.display = "block";
-        popupText.textContent = card.text;
-    } else {
-        popupImg.style.display = "none";
-        popupText.textContent = card;
-    }
+function assignCharacters() {
+    const count = parseInt(document.getElementById('playerCount').value);
+    const shuffled = [...characterPool].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count);
 
-    popup.classList.add("show");
+    players = selected.map((char, i) => ({
+        name: `Player ${i + 1}`,
+        character: char,
+        // cards: [], // Removed initialization for cards, as they are no longer stored here
+        coins: 0
+    }));
 
-    // Hide after 2.5 seconds
-    setTimeout(() => {
-        popup.classList.remove("show");
-    }, 2500);
+    const container = document.getElementById('characterAssignments');
+    container.innerHTML = '';
+
+    players.forEach(player => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <p>${player.name}: ${player.character.name}</p>
+            <img src="${player.character.img}" alt="${player.character.name}" style="width:80px;">
+        `;
+        container.appendChild(div);
+    });
+
+    document.getElementById('startGameBtn').style.display = 'inline-block';
 }
 
+function startGame() {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'block';
+    document.getElementById('playerSummary').style.display = 'flex';
+    updatePlayerSummary();
+    highlightCurrentPlayer();
+}
+
+function showStartScreen() {
+    // Clear the current game state
+    resetGame();
+    // Reset current player index
+    currentPlayerIndex = 0;
+    // Hide the game screen
+    document.getElementById('gameScreen').style.display = 'none';
+    // Hide player UI
+    document.getElementById('playerSummary').style.display = 'none';
+    // Show the start screen
+    document.getElementById('startScreen').style.display = 'block';
+    // Clear character assignments display on the start screen
+    document.getElementById('characterAssignments').innerHTML = '';
+    // Hide the "Start Game" button until characters are reassigned
+    document.getElementById('startGameBtn').style.display = 'none';
+}

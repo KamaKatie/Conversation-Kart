@@ -13,6 +13,11 @@
   src: url("resources/fonts/AOTFShinGoProRegular.otf") format("opentype");
 }
 
+#startScreen {
+  color: white;
+  text-shadow: 0 8px 8px rgba(0, 0, 0, 0.3);
+}
+
 html {
   height: auto;
   min-height: 100%;
@@ -43,11 +48,12 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 700px;
   margin: auto;
   background: white;
   padding: 20px;
   border-radius: 8px;
+  margin-bottom: 140px; /* enough space for player bar */
 }
 
 button {
@@ -160,4 +166,96 @@ button {
 .card-popup p {
   font-size: 1.5rem;
   color: #333;
+}
+
+.screen {
+  text-align: center;
+  padding: 40px;
+}
+
+#characterAssignments {
+  margin: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+#characterAssignments div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* center everything vertically */
+  width: 200px;
+  height: 200px;
+  text-align: center;
+  border: 2px solid rgb(255, 255, 255);
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  color: white;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+#characterAssignments p {
+  margin: 4px 0; /* tighter vertical spacing */
+}
+
+#characterAssignments img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin: 6px 0; /* reduce image margin */
+}
+
+.player-summary {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 5px 10px;
+  z-index: 100;
+  max-height: 220px; /* limits height */
+  overflow-y: auto;
+}
+
+.player-box {
+  border: 1px solid #fff;
+  border-radius: 10px;
+  padding: 4px;
+  background-color: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  color: white;
+  width: 140px;
+  font-size: 0.75rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.player-box img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.player-box ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: 0.7rem;
+  max-height: 40px;
+  overflow-y: auto;
+}
+
+.controls {
+  margin-top: 20px;
+  align-items: center;
+  gap: 20px;
+  font-size: 1.2rem;
 }
