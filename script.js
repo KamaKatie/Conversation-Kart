@@ -93,16 +93,14 @@ function updateDrawnCards() {
     const ul = document.getElementById('drawnCards');
     ul.innerHTML = '';
 
-    cardHistory.forEach(entry => {
+    // Reverse the card history so newest is first
+    [...cardHistory].reverse().forEach(entry => {
         const li = document.createElement('li');
         const player = players[entry.playerIndex];
 
-        // --- Start of change ---
-        // Create a fragment to hold the card content first
         const cardContentFragment = document.createDocumentFragment();
 
         if (typeof entry.card === 'object') {
-            // Mystery card with image
             const img = document.createElement('img');
             img.src = entry.card.img;
             img.alt = entry.card.text;
@@ -114,16 +112,13 @@ function updateDrawnCards() {
             span.textContent = entry.card.text;
             cardContentFragment.appendChild(span);
         } else {
-            // Question card (plain text)
             const span = document.createElement('span');
             span.textContent = entry.card;
             cardContentFragment.appendChild(span);
         }
 
-        // Append the card content to the list item
         li.appendChild(cardContentFragment);
 
-        // Add player's icon at the end
         if (player && player.character && player.character.icon) {
             const playerIcon = document.createElement('img');
             playerIcon.src = player.character.icon;
@@ -131,12 +126,11 @@ function updateDrawnCards() {
             playerIcon.style.width = '24px';
             playerIcon.style.height = '24px';
             playerIcon.style.verticalAlign = 'middle';
-            playerIcon.style.marginLeft = '8px'; // Use marginLeft to push it right
+            playerIcon.style.marginLeft = '8px';
             li.appendChild(playerIcon);
         }
-        // --- End of change ---
 
-        ul.appendChild(li);
+        ul.appendChild(li); // This works because the list is reversed
     });
 }
 
@@ -210,10 +204,32 @@ function nextPlayer() {
 function highlightCurrentPlayer() {
     const display = document.getElementById('currentPlayerDisplay');
     if (display && players.length > 0) {
-        display.textContent = `Current Player: ${players[currentPlayerIndex].name}`;
+        display.innerHTML = ''; // Clear previous content
+
+        const player = players[currentPlayerIndex];
+
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = 'Current Player: ';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = player.character.name;
+
+        const iconImg = document.createElement('img');
+        iconImg.src = player.character.icon;
+        iconImg.alt = player.character.name;
+        iconImg.style.width = '24px';
+        iconImg.style.height = '24px';
+        iconImg.style.verticalAlign = 'middle';
+        iconImg.style.marginLeft = '6px';
+
+        display.appendChild(labelSpan);
+        display.appendChild(nameSpan);
+        display.appendChild(iconImg);
     }
+
     updatePlayerSummary();
 }
+
 
 // ----- Popup and Animation -----
 
