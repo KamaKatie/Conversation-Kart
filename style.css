@@ -48,7 +48,7 @@ body {
 }
 
 .container {
-  max-width: 80vw;
+  max-width: 800px;
   margin: auto;
   background: white;
   padding: 4vw;
