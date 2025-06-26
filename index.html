@@ -51,8 +51,10 @@
                 </div>
 
                 <div class="controls">
+                    <button id="coin" onclick="changeCoins(-1)">-1 Coin</button>
                     <button onclick="undoLastAction()">Undo</button>
                     <button onclick="nextPlayer()">Next Player</button>
+                    <button id="coin" onclick="changeCoins(1)">+1 Coin</button>
                 </div>
 
                 <!-- Drawn Cards List -->
@@ -61,11 +63,6 @@
                     <ul id="drawnCards"></ul>
                 </div>
 
-                <!-- Coin Controls -->
-                <div class="coins">
-                    <button onclick="changeCoins(1)">+1 Coin</button>
-                    <button onclick="changeCoins(-1)">-1 Coin</button>
-                </div>
             </div>
         </div>
 

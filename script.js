@@ -53,13 +53,13 @@ const questionCards = [
 
 // ----- Characters -----
 const characterPool = [
-    { name: "Mario", img: "resources/images/mario.webp", icon: "resources/images/mario-icon.png" },
-    { name: "Peach", img: "resources/images/peach.webp", icon: "resources/images/peach-icon.png" },
-    { name: "Yoshi", img: "resources/images/yoshi.webp", icon: "resources/images/yoshi-icon.png" },
-    { name: "Luigi", img: "resources/images/luigi.webp", icon: "resources/images/luigi-icon.png" },
-    { name: "Toad", img: "resources/images/toad.webp", icon: "resources/images/toad-icon.png" },
-    { name: "Donkey Kong", img: "resources/images/donkeykong.webp", icon: "resources/images/donkeykong-icon.png" },
-    { name: "Bowser", img: "resources/images/bowser.webp", icon: "resources/images/bowser-icon.png" }
+    { name: "Mario", img: "resources/images/mario.webp", icon: "resources/images/mario-icon.png", color: "#ff4d4d" },
+    { name: "Peach", img: "resources/images/peach.webp", icon: "resources/images/peach-icon.png", color: "#ff6cd5" },
+    { name: "Yoshi", img: "resources/images/yoshi.webp", icon: "resources/images/yoshi-icon.png", color: "#7fff7f" },
+    { name: "Luigi", img: "resources/images/luigi.webp", icon: "resources/images/luigi-icon.png", color: "#00b911" },
+    { name: "Toad", img: "resources/images/toad.webp", icon: "resources/images/toad-icon.png", color: "#ffffff" },
+    { name: "Donkey Kong", img: "resources/images/donkeykong.webp", icon: "resources/images/donkeykong-icon.png", color: "#92410e" },
+    { name: "Bowser", img: "resources/images/bowser.webp", icon: "resources/images/bowser-icon.png", color: "#ffc400" }
 ];
 
 // ----- UI Update Functions -----
@@ -213,6 +213,14 @@ function highlightCurrentPlayer() {
 
         const nameSpan = document.createElement('span');
         nameSpan.textContent = player.character.name;
+        nameSpan.style.padding = "5px";
+        nameSpan.style.borderRadius = "10px";
+        nameSpan.style.boxShadow = "2px 2px 2px rgba(0, 0, 0, 0.3)"
+        nameSpan.style.background = player.character.color;
+        if (player.character.name === "Toad") {
+            nameSpan.style.color = "red";
+        } else
+            nameSpan.style.color = "white";
 
         const iconImg = document.createElement('img');
         iconImg.src = player.character.icon;

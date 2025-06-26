@@ -43,27 +43,24 @@ body::before {
 
 body {
   font-family: "Bold", sans-serif;
-  padding: 5vw;
   text-align: center;
 }
 
+h1 {
+  margin: 0;
+}
+
 .container {
+  display: flex;
   max-width: 800px;
   margin: auto;
   background: white;
-  padding: 4vw;
+  padding: 2vw;
   border-radius: 1rem;
-  margin-bottom: 20vh;
 }
 
 button {
   font-family: "Medium";
-}
-
-.card-section button,
-.coins button,
-.reset button {
-  margin: 1em;
   font-size: 1rem;
 }
 
@@ -81,7 +78,7 @@ button {
   background-position: center;
   border-radius: 10px;
   cursor: pointer;
-  border: 0.3em white solid;
+  border: 0.4em white solid;
   box-shadow: 0 0.15em 0.6em rgba(0, 0, 0, 0.3);
 }
 
@@ -125,7 +122,7 @@ button {
 }
 
 #drawnCards {
-  max-height: 200px; /* or whatever works well in your layout */
+  max-height: 150px; /* or whatever works well in your layout */
   overflow-y: auto;
   padding: 0;
   margin: 1.2em auto;
@@ -137,7 +134,7 @@ button {
 
 #drawnCards li {
   align-items: center;
-  margin-bottom: 10px;
+  margin: 10px;
   font-size: 1.2rem;
   font-family: Regular;
 }
@@ -165,7 +162,8 @@ button {
   visibility: hidden;
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s 0.4s;
   z-index: 10000;
-  max-width: 90%;
+  max-width: 50vw;
+  min-width: 500px;
 }
 
 .card-popup.show {
@@ -195,13 +193,17 @@ button {
   margin: 5vw;
   display: flex;
   flex-wrap: wrap;
-  gap: 2vw;
+  gap: 1vw;
   justify-content: center;
 }
 
+/* This assumes each character card is a direct child of #characterAssignments */
+#characterAssignments > * {
+  flex: 1 1 calc((100% - 4vw) / 3);
+  max-width: calc((100% - 4vw) / 3);
+}
+
 #characterAssignments div {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 40vw;
@@ -238,7 +240,6 @@ button {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5em;
-  padding: 0.5em 1em;
   z-index: 100;
   max-height: 25vh;
   overflow-y: auto;
@@ -247,20 +248,18 @@ button {
 .player-box {
   border: 1px solid #fff;
   border-radius: 10px;
-  padding: 0.5em;
   background-color: rgba(0, 0, 0, 0.6);
   box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.4);
   color: white;
   width: 28vw;
   max-width: 140px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-align: center;
   flex-shrink: 0;
 }
 
 .player-box img {
   width: 50%;
-  max-width: 50px;
   aspect-ratio: 1;
   object-fit: contain;
 }
@@ -268,25 +267,24 @@ button {
 .player-box ul {
   padding: 0;
   margin: 0;
-  list-style: none;
-  font-size: 0.7rem;
+  line-height: 10px;
+  font-size: 0.8rem;
   max-height: 40px;
   overflow-y: auto;
+}
+
+.player-box p,
+h3 {
+  margin: 0.2rem;
 }
 
 .controls {
   margin-top: 2em;
   align-items: center;
   gap: 2em;
-  font-size: 1.2rem;
 }
 
-@media (max-width: 480px) {
-  .card-btn {
-    width: 80vw;
-  }
-
-  .card-popup p {
-    font-size: 1.2rem;
-  }
+.reset button {
+  margin: 0.3rem;
+  font-size: 0.7rem;
 }
